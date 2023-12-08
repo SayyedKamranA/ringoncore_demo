@@ -1,42 +1,68 @@
 import React, { useEffect, useState } from "react";
 import "../../style.css";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import { login, register } from "../../redux/actions/userAction";
+import axios from "axios";
 function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const navigate = useNavigate()
-  // pramod.kumar@ringoncore.com
-  // Support@321!
-  useEffect(() => {}, []);
+const [email, setEmail] = useState("");
+const [password, setPassword] = useState("");
+const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+console.log('user', user)
+const dispatch = useDispatch();
+const navigate = useNavigate();
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    console.log(email, password);
-    axios
+// Listen for changes in the user state
+// useEffect(() => {
+//   const user = JSON.parse(localStorage.getItem("user"));
+//   if (user?.success === 1) {
+//     navigate("/dashboard");
+//   }
+// }, [navigate,user]);
+
+const handleSubmit = (event) => {
+  event.preventDefault();
+  dispatch(login(email, password));
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+  axios
       .get(
         `https://ikalyuga.com/api/index.php?action=login&email=${email}&password=${password}`,
-        {}
-      )
-      .then((res) => {
+        config
+      ).then((res)=>{
         const data = res?.data?.response;
-       
-      
-        if(data.success === 1){
-          toast.success(data.message, {
-            position: toast.POSITION.TOP_RIGHT,
-            autoClose: 1500,
-          });
-          navigate("/dashboard",{ state: { data: data } })
-        }else{
-          toast.error(data.message, {
-            position: toast.POSITION.TOP_RIGHT,
-            autoClose: 1500,
-          });
+        if (data?.success === 1) {
+          navigate("/dashboard");
         }
-      });
-  };
+      })
+  // Clear the form fields
+  setEmail("");
+  setPassword("");
+};
+
+//   const state = useSelector((state) => state?.user?.user);
+//   const [email, setEmail] = useState("");
+//   const [password, setPassword] = useState("");
+//   const dispatch = useDispatch();
+//   const navigate = useNavigate()
+//   // pramod.kumar@ringoncore.com
+//   // Support@321!
+//   useEffect(() => {}, []);
+// const user = JSON.parse(localStorage.getItem("user"));
+
+//   const handleSubmit = (event) => {
+//     event.preventDefault();
+//     dispatch(login(email, password, ));
+//   if(user?.success === 1){
+//  navigate("/dashboard")
+//   setEmail("");
+//   setPassword("");
+//  }
+                 
+//   };
 
   return (
     <section className="login-sec">
